@@ -1,41 +1,47 @@
 import cv2
 import numpy as np
 
-# expected_size = (1280, 720)
-expected_size = (640, 360)
-expected_fps = 5
+TARGET_SIZE = (640, 360)
+TARGET_FPS = 20 # It might be complicated to use non-divisible number from target
 
-cap = cv2.VideoCapture('./target.MOV')
-fourcc = cv2.VideoWriter_fourcc(*'avc1') # Apple's version of MPEG4 part 10 / H.264
+def reduce_quality(input_file, output_file):
+	cap = cv2.VideoCapture(input_file)
+	fourcc = cv2.VideoWriter_fourcc(*'avc1') # Apple's version of MPEG4 part 10 / H.264
 
-out = cv2.VideoWriter('output.MOV', fourcc, 20, expected_size)
-count = 100
-while True:
-	ret, frame = cap.read()
-	if ret == True:
-		b = cv2.resize(frame, expected_size, fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
-		out.write(b)
-
-		###################
-		# Extra 2 read-without-write to reduce frame rate slowdown
-		# If we want to allow created video to contain slow motion, we need to 
-		#   comment out this extra rate while maintaining reduced frame rate
-		#   comparing to source
+	out = cv2.VideoWriter(output_file, fourcc, TARGET_FPS, TARGET_SIZE)
+	count = 100
+	while True:
 		ret, frame = cap.read()
-		ret, frame = cap.read()
+		if ret == True:
+			b = cv2.resize(frame, TARGET_SIZE, fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
+			out.write(b)
 
-		###################
-		# Debug only
-		# cv2.imshow('resized_frame', b)
-		# cv2.waitKey(10)
-		# break
-		# if (count > 100):
-		# 	break
-		# else:
-		# 	count += 1
-	else:
-		break
+			###################
+			# Extra 2 read-without-write to reduce frame rate slowdown
+			# If we want to allow created video to contain slow motion, we need to 
+			#   comment out this extra rate while maintaining reduced frame rate
+			#   comparing to source
+			ret, frame = cap.read()
+			ret, frame = cap.read()
 
-cap.release()
-out.release()
-cv2.destroyAllWindows()
+			###################
+			# Debug only
+			# cv2.imshow('resized_frame', b)
+			# cv2.waitKey(10)
+			# break
+			# if (count > 100):
+			# 	break
+			# else:
+			# 	count += 1
+		else:
+			break
+
+	cap.release()
+	out.release()
+	cv2.destroyAllWindows()
+
+
+reduce_quality(input_file='./target.MOV', output_file='./output.MOV')
+
+
+
