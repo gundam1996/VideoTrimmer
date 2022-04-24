@@ -45,7 +45,7 @@ def reduce_quality(input_file, output_file):
 	cv2.destroyAllWindows()
 
 
-reduce_quality(input_file='./target.MOV', output_file='./output.MOV')
+reduce_quality(input_file='./target_short.MOV', output_file='./output.MOV')
 
 
 
