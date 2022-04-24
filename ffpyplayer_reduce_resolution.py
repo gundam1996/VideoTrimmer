@@ -1,3 +1,6 @@
+from ffpyplayer.player import MediaPlayer
+from ffpyplayer.writer import MediaWriter
+from ffpyplayer.pic import Image
 import cv2
 import numpy as np
 
@@ -8,35 +11,21 @@ def reduce_quality(input_file, output_file):
 	cap = cv2.VideoCapture(input_file)
 	fourcc = cv2.VideoWriter_fourcc(*'avc1') # Apple's version of MPEG4 part 10 / H.264
 
-	out = cv2.VideoWriter(output_file, fourcc, TARGET_FPS, TARGET_SIZE)
-	count = 100
+	# out = cv2.VideoWriter(output_file, fourcc, TARGET_FPS, TARGET_SIZE)
+	
+	out_opts = {'pix_fmt_in':'rgb24', 'width_in':TARGET_SIZE[0], 'height_in':TARGET_SIZE[1], 'codec':'rawvideo', 'frame_rate':(20, 1)}
+	writer = MediaWriter(output_file, [out_opts])
+
 	while True:
 		ret, frame = cap.read()
-
 		if ret == True:
 			b = cv2.resize(frame, TARGET_SIZE, fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
-			out.write(b)
-
-			# print(type(frame), len(frame))
-			# print(len(frame), len(frame[0]), len(frame[0][0]))
-			# print(TARGET_SIZE[0], TARGET_SIZE[1], 3)
-			# print(frame.flatten(), len(frame.flatten()), type(bytearray(frame.flatten())), TARGET_SIZE[0] * TARGET_SIZE[1] * 3)			
-
-			print(cap.get(cv2.CAP))
-
-			# print("")
-			# print(type(b), len(b))
-			# print(len(b), len(b[0]), len(b[0][0]))
-			# print()
-
-			break
-
-			# print(cap.get(cv2.CAP_PROP_POS_MSEC))
-
-			# count -= 1
-
-			# if (count < 90):
-			# 	break
+			img = Image(plane_buffers=[bytearray(b.flatten())], pix_fmt='rgb24', size=(TARGET_SIZE[0], TARGET_SIZE[1]))
+			
+			pts = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
+			if (pts != 0.0):
+				# print(f"pts={pts}")
+				writer.write_frame(img=img, pts=pts, stream=0)
 
 			###################
 			# Extra 2 read-without-write to reduce frame rate slowdown
@@ -59,11 +48,11 @@ def reduce_quality(input_file, output_file):
 			break
 
 	cap.release()
-	out.release()
+	# out.release()
 	cv2.destroyAllWindows()
 
 
-reduce_quality(input_file='./target.MOV', output_file='./output.MOV')
+reduce_quality(input_file='./target_short.MOV', output_file='./output.MOV')
 
 
 
