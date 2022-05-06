@@ -4,14 +4,18 @@ import numpy as np
 TARGET_SIZE = (640, 360)
 TARGET_FPS = 20 # It might be complicated to use non-divisible number from target
 
+# TARGET_SIZE = (7680, 4320)
+# TARGET_FPS = 60 # It might be complicated to use non-divisible number from target
+
 def reduce_quality(input_file, output_file):
 	cap = cv2.VideoCapture(input_file)
 	fourcc = cv2.VideoWriter_fourcc(*'avc1') # Apple's version of MPEG4 part 10 / H.264
 
 	out = cv2.VideoWriter(output_file, fourcc, TARGET_FPS, TARGET_SIZE)
-	count = 100
+
 	while True:
 		ret, frame = cap.read()
+
 		if ret == True:
 			b = cv2.resize(frame, TARGET_SIZE, fx=0, fy=0, interpolation=cv2.INTER_CUBIC)
 			out.write(b)
@@ -41,7 +45,19 @@ def reduce_quality(input_file, output_file):
 	cv2.destroyAllWindows()
 
 
-reduce_quality(input_file='./target.MOV', output_file='./output.MOV')
+import sys, os
+
+if (len(sys.argv) > 2):
+	INPUT_FOLDER = sys.argv[1]
+	OUTPUT_FOLDER = sys.argv[2]
+
+	for file in os.listdir(INPUT_FOLDER):
+		# reduce_quality(input_file=f"./{file}", output_file=f"{OUTPUT_FOLDER/shortened_{file}}")
+		print(f"./{file}", f"{OUTPUT_FOLDER}/shortened_{file}")
+
+		# reduce_quality(input_file='./target_short.MOV', output_file='./output.MOV')
+else:
+	print(f"Not sure what to do with: {sys.argv}")
 
 
 
