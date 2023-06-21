@@ -1,11 +1,12 @@
 import cv2
 import numpy as np
+import librosa, soundfile
 
-TARGET_SIZE = (1280, 720)
+TARGET_SIZE = (480, 360)
 # TARGET_FPS = 60 # It might be complicated to use non-divisible number from target
 
 # TARGET_SIZE = (640, 360)
-TARGET_FPS = 60 # It might be complicated to use non-divisible number from target
+TARGET_FPS = 30 # It might be complicated to use non-divisible number from target
 
 # TARGET_SIZE = (7680, 4320)
 # TARGET_FPS = 60 # It might be complicated to use non-divisible number from target
@@ -32,9 +33,9 @@ def reduce_quality(input_file, output_file):
 			# If we want to allow created video to contain slow motion, we need to 
 			#   comment out this extra rate while maintaining reduced frame rate
 			#   comparing to source
-			if (TARGET_FPS != 60):
-				ret, frame = cap.read()
-				ret, frame = cap.read()
+			# if (TARGET_FPS != 60):
+			# 	ret, frame = cap.read()
+			# 	ret, frame = cap.read()
 
 			###################
 			# Debug only
@@ -62,6 +63,10 @@ if (len(sys.argv) > 2):
 	for file in os.listdir(INPUT_FOLDER):
 		if (file != ".DS_Store" or (len(file) > 1 and file[0] != '.')): # Do not take cache or hidden file into consideration
 			reduce_quality(input_file=f"./{INPUT_FOLDER}/{file}", output_file=f"./{OUTPUT_FOLDER}/shortened_{file}")
+
+			# Extract Audio file. They can be merged manually later on
+			audio, sr = librosa.load(f"./{INPUT_FOLDER}/{file}")
+			soundfile.write(f"./{OUTPUT_FOLDER}/shortened_{file}.FLAC", audio, sr, format="FLAC")
 else:
 	print(f"Not sure what to do with: {sys.argv}")
 

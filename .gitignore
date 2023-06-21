@@ -1,3 +1,5 @@
 *.MOV
 env/
 .DS_Store
+Output/
+ToParse/
